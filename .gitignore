@@ -3,3 +3,4 @@
 .env
 storage/*.key
 public/storage
+/docker-db-data

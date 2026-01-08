@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  # --- Service 1: Aplikasi Laravel ---
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ddp_api_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www
+      - /var/www/vendor # Mengamankan vendor agar tetap di dalam Docker
+    depends_on:
+      - db
+    networks:
+      - ddp_network
+
+  # --- Service 2: Database MySQL (Pengganti Laragon) ---
+  db:
+    image: mysql:8.0
+    container_name: ddp_api_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: db_ddp_api
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      # Inovasi: Data database Mas akan disimpan di folder ini di laptop (AMAN!)
+      - ./docker-db-data:/var/lib/mysql
+      # Inovasi: Folder untuk menaruh file backup .sql dari Laragon
+      - ./docker-db:/docker-entrypoint-initdb.d 
+    networks:
+      - ddp_network
+
+networks:
+  ddp_network:
+    driver: bridge
